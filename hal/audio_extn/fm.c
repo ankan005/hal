@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2019 The Linux Foundation. All rights reserved.
  * Not a Contribution.
  *
  * Copyright (C) 2013 The Android Open Source Project
@@ -45,6 +45,7 @@
 #define AUDIO_PARAMETER_KEY_FM_MUTE "fm_mute"
 #define AUDIO_PARAMETER_KEY_FM_RESTORE_VOLUME "fm_restore_volume"
 #define AUDIO_PARAMETER_KEY_FM_ROUTING "fm_routing"
+#define AUDIO_PARAMETER_KEY_FM_STATUS "fm_status"
 #define FM_LOOPBACK_DRAIN_TIME_MS 2
 
 static struct pcm_config pcm_config_fm = {
@@ -252,6 +253,19 @@ exit:
     return ret;
 }
 
+void audio_extn_fm_get_parameters(struct str_parms *query, struct str_parms *reply)
+{
+    int ret, val;
+    char value[32]={0};
+
+    ALOGV("%s: enter", __func__);
+    ret = str_parms_get_str(query, AUDIO_PARAMETER_KEY_FM_STATUS, value, sizeof(value));
+    if (ret >= 0) {
+        val = (fmmod.is_fm_running ? 1: 0);
+        str_parms_add_int(reply, AUDIO_PARAMETER_KEY_FM_STATUS, val);
+    }
+}
+
 void audio_extn_fm_set_parameters(struct audio_device *adev,
                                   struct str_parms *parms)
 {
@@ -375,4 +389,25 @@ void audio_extn_fm_set_parameters(struct audio_device *adev,
 exit:
     ALOGV("%s: exit", __func__);
 }
+
+void audio_extn_fm_route_on_selected_device(struct audio_device *adev, audio_devices_t device)
+{
+    struct listnode *node;
+    struct audio_usecase *usecase;
+
+    if (fmmod.is_fm_running) {
+        list_for_each(node, &adev->usecase_list) {
+            usecase = node_to_item(node, struct audio_usecase, list);
+            if (usecase->id == USECASE_AUDIO_PLAYBACK_FM) {
+                if (fmmod.fm_device != device) {
+                    ALOGV("%s selected routing device %x current device %x"
+                          "are different, reroute on selected device", __func__,
+                          fmmod.fm_device, device);
+                    select_devices(adev, usecase->id);
+                }
+            }
+        }
+    }
+}
+
 #endif /* FM_POWER_OPT end */

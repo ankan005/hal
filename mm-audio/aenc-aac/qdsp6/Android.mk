@@ -37,7 +37,15 @@ LOCAL_SHARED_LIBRARIES  := libutils liblog
 LOCAL_SRC_FILES         := src/aenc_svr.c
 LOCAL_SRC_FILES         += src/omx_aac_aenc.cpp
 
-LOCAL_HEADER_LIBRARIES := generated_kernel_headers
+ifeq ($(strip $(AUDIO_FEATURE_ENABLED_GCOV)),true)
+LOCAL_CFLAGS += --coverage -fprofile-arcs -ftest-coverage
+LOCAL_CPPFLAGS += --coverage -fprofile-arcs -ftest-coverage
+LOCAL_STATIC_LIBRARIES += libprofile_rt
+endif
+
+LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/techpack/audio/include
+LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 ifeq ($(strip $(AUDIO_FEATURE_ENABLED_DLKM)),true)
   LOCAL_HEADER_LIBRARIES := audio_kernel_headers
 endif
