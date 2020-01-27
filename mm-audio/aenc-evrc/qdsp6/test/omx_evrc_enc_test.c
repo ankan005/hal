@@ -291,6 +291,12 @@ int get_input_and_validate(char *input, datatype type)
         status = -1;
         goto exit;
     }
+    ptr = (char *)malloc(strlen(input) + 1);
+    if (ptr == NULL) {
+        DEBUG_PRINT("Low memory\n");
+        status = -1;
+        goto exit;
+    }
     /* Check for negative input */
     if (*input == '-') {
         DEBUG_PRINT("Negative Number is not allowed\n");
@@ -329,6 +335,8 @@ int get_input_and_validate(char *input, datatype type)
             break;
     }
 exit:
+    if (ptr != NULL)
+        free(ptr);
     if (status != 0)
         exit(0);
     return value;

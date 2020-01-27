@@ -12,10 +12,4 @@ LOCAL_SHARED_LIBRARIES := \
     liblog \
     libcutils
 
-ifeq ($(strip $(AUDIO_FEATURE_ENABLED_GCOV)),true)
-LOCAL_CFLAGS += --coverage -fprofile-arcs -ftest-coverage
-LOCAL_CPPFLAGS += --coverage -fprofile-arcs -ftest-coverage
-LOCAL_STATIC_LIBRARIES += libprofile_rt
-endif
-
 include $(BUILD_EXECUTABLE)

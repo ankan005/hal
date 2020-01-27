@@ -29,20 +29,6 @@
 #include "effect_api.h"
 #include "virtualizer.h"
 
-#define VIRUALIZER_MAX_LATENCY 30
-
-#ifdef AUDIO_FEATURE_ENABLED_GCOV
-extern void  __gcov_flush();
-static void enable_gcov()
-{
-    __gcov_flush();
-}
-#else
-static void enable_gcov()
-{
-}
-#endif
-
 /* Offload Virtualizer UUID: 509a4498-561a-4bea-b3b1-0002a5d5c51b */
 const effect_descriptor_t virtualizer_descriptor = {
         {0x37cc2c00, 0xdddd, 0x11db, 0x8577, {0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b}},
@@ -489,7 +475,7 @@ int virtualizer_init(effect_context_t *context)
     virt_ctxt->forced_device = AUDIO_DEVICE_NONE;
     virt_ctxt->device = AUDIO_DEVICE_NONE;
     memset(&(virt_ctxt->offload_virt), 0, sizeof(struct virtualizer_params));
-    enable_gcov();
+
     return 0;
 }
 
@@ -514,7 +500,6 @@ int virtualizer_enable(effect_context_t *context)
                                            OFFLOAD_SEND_VIRTUALIZER_ENABLE_FLAG |
                                            OFFLOAD_SEND_VIRTUALIZER_STRENGTH);
     }
-    enable_gcov();
     return 0;
 }
 
@@ -536,7 +521,6 @@ int virtualizer_disable(effect_context_t *context)
                                            &virt_ctxt->offload_virt,
                                            OFFLOAD_SEND_VIRTUALIZER_ENABLE_FLAG);
     }
-    enable_gcov();
     return 0;
 }
 
@@ -557,7 +541,6 @@ int virtualizer_start(effect_context_t *context, output_context_t *output)
                                            OFFLOAD_SEND_VIRTUALIZER_ENABLE_FLAG |
                                            OFFLOAD_SEND_VIRTUALIZER_STRENGTH);
     }
-    enable_gcov();
     return 0;
 }
 
@@ -574,7 +557,6 @@ int virtualizer_stop(effect_context_t *context, output_context_t *output __unuse
                                         OFFLOAD_SEND_VIRTUALIZER_ENABLE_FLAG);
     }
     virt_ctxt->ctl = NULL;
-    enable_gcov();
     return 0;
 }
 

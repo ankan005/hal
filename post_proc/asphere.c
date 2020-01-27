@@ -62,18 +62,6 @@ enum {
     ASPHERE_ERROR
 };
 
-#ifdef AUDIO_FEATURE_ENABLED_GCOV
-extern void  __gcov_flush();
-static void enable_gcov()
-{
-    __gcov_flush();
-}
-#else
-static void enable_gcov()
-{
-}
-#endif
-
 struct asphere_module {
     bool enabled;
     int status;
@@ -169,7 +157,6 @@ static void asphere_init_once() {
 
 static int asphere_init() {
     pthread_once(&asphere_once, asphere_init_once);
-    enable_gcov();
     return asphere.init_status;
 }
 
